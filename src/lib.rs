@@ -1,18 +1,19 @@
 #![allow(dead_code, unused_variables, unused_imports)]
 // "Git is fundamentally a content-addressable filesystem with a VCS user interface written on top of it"
-// the one true src: https://git-scm.com/book/en/v2/Git-Internals-Plumbing-and-Porcelain
+// The one true src: https://git-scm.com/book/en/v2/Git-Internals-Plumbing-and-Porcelain
 
 use std::fs::File;
 use std::hash::Hash;
 use std::io::prelude::*;
-use std::rc::Rc;
+
+use clap;
 
 // Typedefs.
 type Objects = Vec<Object>;
 type Blob = File;
 
 enum Tree {
-    MaybeTree(Option<Rc<Tree>>),
+    MaybeTree(Option<Box<Tree>>),
     MaybeBlob(Option<Blob>),
 }
 
@@ -38,6 +39,12 @@ enum BlobState {
     Untracked, // in working tree
     Added,     // out of working tree, into index
     Committed, // out of index, into remote
+}
+
+// does this make sense? what else should go here?
+struct Index {
+    trees: Vec<Option<Tree>>,
+    blobs: Vec<Option<Blob>>,
 }
 
 // TODO: use typestate pattern to encode the staging area/ready to add/push whatever
